@@ -50,7 +50,7 @@ class NotificationManager:
             chat_id = self.config['telegram']['chat_id']
             
             # 添加详情链接到消息末尾
-            base_url = self.config.get('web_dashboard_url', 'https://github.com/BeroBin/vps-date')
+            base_url = self.config.get('web_dashboard_url', 'https://berobin.github.io/vps-date')
             message += f"\n\n👉 查看详情：{base_url}"
             
             # 发送消息到Telegram
