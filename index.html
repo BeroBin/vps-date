@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VPS到期监控</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- 使用霞鹜文楷屏幕阅读体 -->
     <link rel="stylesheet" href="https://npm.elemecdn.com/lxgw-wenkai-screen-webfont@1.7.0/lxgwwenkaiscreen.css">
     <style>
         body {
@@ -402,7 +401,6 @@
     <div class="container">
         <script src="exchange_rates.js"></script>
         <h1 class="page-title">VPS到期监控</h1>
-        <!-- 状态统计面板 -->
         <div class="stats-container">
             <div class="row">
                 <div class="col-md-4 stats-item">
@@ -414,19 +412,17 @@
                     <p id="totalCost">--</p>
                 </div>
                 <div class="col-md-4 stats-item">
-                    <h3>即将到期</h3>
+                    <h3>即将到期 (7天内)</h3>
                     <p id="expiringCount">--</p>
                 </div>
             </div>
         </div>
 
-        <!-- VPS列表容器（使用统一大背景） -->
         <div class="vps-list-container">
-            <!-- 列表标题头 -->
             <div class="vps-list-header">
                 <div class="vps-header-name">服务器名称</div>
                 <div class="vps-header-info">
-                    <div class="vps-header-item">月付</div>
+                    <div class="vps-header-item">费用</div>
                     <div class="vps-header-item">折合人民币</div>
                     <div class="vps-header-item">到期时间</div>
                 </div>
@@ -434,7 +430,6 @@
                 <div class="vps-header-status">剩余天数</div>
             </div>
             
-            <!-- VPS行列表 -->
             <div id="vpsRows">
                 <div class="text-center" id="loadingMessage">
                     <div class="spinner-border text-success" role="status">
@@ -446,9 +441,6 @@
     </div>
 
     <script>
-        // 调试信息
-        console.log('脚本开始执行');
-        
         const vpsServices = [
     {
         "name": "BWG-NODESEEK-MEGABOX-PRO",
@@ -491,7 +483,7 @@
         "url": "https://legendvps.com/clientarea.php?action=productdetails&id=5736"
     },
     {
-        "name": "Bytevirt-LA-China Optimized Elite-512-KVM-Elite",
+        "name": "Bytevirt-LA-China Optimized",
         "cost": 24.0,
         "currency": "USD",
         "billingCycle": "Annually",
@@ -499,7 +491,7 @@
         "url": "https://bytevirt.com/clientarea.php?action=productdetails&id=20339"
     },
     {
-        "name": "Colocrossing-2GB Black Friday KVM VPS (2023) Specials",
+        "name": "Colocrossing-Black Friday (2023) Specials",
         "cost": 15.0,
         "currency": "USD",
         "billingCycle": "Annually",
@@ -531,8 +523,8 @@
         "url": "https://claw.cloud/clientarea.php?action=productdetails&id=33367"
     },
     {
-        "name": "WAWO-HKd-ipv6-0.5G-Is-16",
-        "cost": 15.9,
+        "name": "WAWO-HKd-ipv6-0.5G-2台",
+        "cost": 31.8,
         "currency": "CNY",
         "billingCycle": "Annually",
         "nextDueDate": "2025-10-21",
@@ -540,69 +532,91 @@
     }
 ];
         
-        console.log('VPS服务数据:', vpsServices);  // 添加调试输出
+        const billingCycleNames = {
+            'Monthly': '月付',
+            'Quarterly': '季度付',
+            'Semi-Annually': '半年付',
+            'Annually': '年付',
+            'Biennially': '2年付',
+            'Triennially': '3年付'
+        };
 
         function formatDate(date) {
             return date.toLocaleDateString('zh-CN', {
                 year: 'numeric',
-                month: 'long',
-                day: 'numeric'
+                month: '2-digit',
+                day: '2-digit'
             });
         }
 
+        // CORRECTED: Calculates days based on 'nextDueDate'
         function calculateDaysUntilExpire(service) {
+            if (!service.nextDueDate) return 'N/A';
             try {
                 const today = new Date();
-                today.setHours(0, 0, 0, 0);  // 设置时间为当天0点
-                let expireDate;
-                
-                if (service.expireDate) {
-                    expireDate = new Date(service.expireDate);
-                    expireDate.setHours(0, 0, 0, 0);  // 设置到期时间为当天0点
-                } else if (service.monthlyExpireDay) {
-                    expireDate = new Date(today.getFullYear(), today.getMonth(), service.monthlyExpireDay);
-                    if (today.getDate() > service.monthlyExpireDay) {
-                        expireDate = new Date(today.getFullYear(), today.getMonth() + 1, service.monthlyExpireDay);
-                    }
-                } else {
-                    return '未设置到期日';
-                }
-                
+                today.setHours(0, 0, 0, 0);
+                const expireDate = new Date(service.nextDueDate);
+                expireDate.setHours(0, 0, 0, 0);
                 const diffTime = expireDate - today;
                 return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             } catch (error) {
-                console.error('计算到期日期时出错:', error);
-                return '计算错误';
+                console.error('Error calculating expiry date:', error);
+                return '错误';
             }
         }
 
+        // CORRECTED: Converts to CNY by dividing by the rate (since base is CNY)
         function convertToCNY(amount, currency) {
-            if (exchangeRates[currency] && !isNaN(amount)) {
-                return amount * exchangeRates[currency];
+            const parsedAmount = parseFloat(amount);
+            if (isNaN(parsedAmount)) return 0;
+            if (currency === 'CNY') return parsedAmount;
+            if (exchangeRates && exchangeRates[currency]) {
+                return parsedAmount / exchangeRates[currency];
             }
             return 0;
         }
 
+        // NEW: Normalizes cost to a monthly figure for summary purposes
+        function normalizeToMonthlyCost(cost, billingCycle) {
+            const parsedCost = parseFloat(cost);
+            if(isNaN(parsedCost)) return 0;
+            switch(billingCycle) {
+                case 'Quarterly': return parsedCost / 3;
+                case 'Semi-Annually': return parsedCost / 6;
+                case 'Annually': return parsedCost / 12;
+                case 'Biennially': return parsedCost / 24;
+                case 'Triennially': return parsedCost / 36;
+                case 'Monthly':
+                default:
+                    return parsedCost;
+            }
+        }
+
+        // FULLY REVISED: Updates rows with correct logic for all fields
         function updateVPSRows() {
             try {
                 const container = document.getElementById('vpsRows');
                 
-                // 计算到期天数并排序
                 const sortedServices = [...vpsServices].sort((a, b) => {
                     const daysA = calculateDaysUntilExpire(a);
                     const daysB = calculateDaysUntilExpire(b);
-                    return (typeof daysA === 'number' && typeof daysB === 'number') ? daysA - daysB : 0;
+                    if (typeof daysA !== 'number') return 1;
+                    if (typeof daysB !== 'number') return -1;
+                    return daysA - daysB;
                 });
 
-                let totalCostCNY = 0;
+                let totalMonthlyCostCNY = 0;
                 let expiringCount = 0;
 
                 const rowsHTML = sortedServices.map(service => {
                     const daysLeft = calculateDaysUntilExpire(service);
-                    const costInCNY = convertToCNY(parseFloat(service.cost), service.currency);
-                    totalCostCNY += costInCNY;
                     
-                    if (typeof daysLeft === 'number' && daysLeft <= 3) {
+                    // Calculate monthly cost for summary
+                    const monthlyCost = normalizeToMonthlyCost(service.cost, service.billingCycle);
+                    const monthlyCostInCNY = convertToCNY(monthlyCost, service.currency);
+                    totalMonthlyCostCNY += monthlyCostInCNY;
+                    
+                    if (typeof daysLeft === 'number' && daysLeft <= 7) {
                         expiringCount++;
                     }
 
@@ -612,23 +626,23 @@
                         else if (daysLeft <= 7) statusClass = 'status-warning';
                     }
 
-                    let expireDateText = service.expireDate ? 
-                        formatDate(new Date(service.expireDate)) : 
-                        service.monthlyExpireDay ? `每月${service.monthlyExpireDay}号` : '未设置';
+                    const cycleDisplayName = billingCycleNames[service.billingCycle] || service.billingCycle;
+                    const expireDateText = service.nextDueDate ? formatDate(new Date(service.nextDueDate)) : 'N/A';
+                    const costInCNY = convertToCNY(service.cost, service.currency);
 
                     return `
                         <div class="vps-row">
                             <div class="vps-name">
-                                <a href="${service.url}" target="_blank">${service.name}</a>
+                                <a href="${service.url || '#'}" target="_blank">${service.name}</a>
                             </div>
                             <div class="vps-info">
                                 <div class="vps-info-item">
-                                    <div class="vps-info-label">月付</div>
+                                    <div class="vps-info-label">${cycleDisplayName}</div>
                                     <div class="vps-info-value">${service.cost} ${service.currency}</div>
                                 </div>
                                 <div class="vps-info-item">
                                     <div class="vps-info-label">折合人民币</div>
-                                    <div class="vps-info-value">${costInCNY ? '¥' + costInCNY.toFixed(2) : '¥0.00'}</div>
+                                    <div class="vps-info-value">${costInCNY ? '¥' + costInCNY.toFixed(2) : 'N/A'}</div>
                                 </div>
                                 <div class="vps-info-item">
                                     <div class="vps-info-label">到期时间</div>
@@ -642,36 +656,29 @@
                     `;
                 }).join('');
 
-                container.innerHTML = rowsHTML;
-                document.getElementById('totalCost').textContent = totalCostCNY ? `¥${totalCostCNY.toFixed(2)}` : '¥0.00';
+                container.innerHTML = rowsHTML || '<p class="text-center">暂无VPS数据。</p>';
+                document.getElementById('totalCost').textContent = totalMonthlyCostCNY ? `¥${totalMonthlyCostCNY.toFixed(2)}` : '¥0.00';
                 document.getElementById('serverCount').textContent = vpsServices.length;
                 document.getElementById('expiringCount').textContent = expiringCount;
             } catch (error) {
                 console.error('更新VPS行时出错:', error);
+                document.getElementById('vpsRows').innerHTML = '<p class="text-center text-danger">加载数据时出错，请检查控制台。</p>';
             }
         }
 
-        // 初始更新
+        // Initial update
         document.addEventListener('DOMContentLoaded', () => {
-            // 模拟exchange_rates.js（如果脚本未加载）
             if (typeof exchangeRates === 'undefined') {
-                window.exchangeRates = {
-                    'USD': 7.1,
-                    'EUR': 7.7,
-                    'CNY': 1
-                };
+                console.warn("exchange_rates.js 未加载或为空，将使用默认汇率。");
+                window.exchangeRates = { 'USD': 1/7.1, 'EUR': 1/7.7, 'CNY': 1, 'HKD': 1/0.9 };
             }
             updateVPSRows();
         });
         
-        // 每天更新一次
-        setInterval(updateVPSRows, 24 * 60 * 60 * 1000);
-
-        // 主题切换功能
+        // Theme toggle functionality
         const themeToggle = document.getElementById('themeToggle');
         const body = document.body;
         
-        // 检查本地存储中的主题设置
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
             body.classList.add('dark-theme');
@@ -679,7 +686,6 @@
 
         themeToggle.addEventListener('click', () => {
             body.classList.toggle('dark-theme');
-            // 保存主题设置到本地存储
             localStorage.setItem('theme', body.classList.contains('dark-theme') ? 'dark' : 'light');
         });
     </script>
