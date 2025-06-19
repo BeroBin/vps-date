@@ -331,7 +331,7 @@
 
         // --- Event Listeners & Initial Load ---
         document.addEventListener('DOMContentLoaded', () => {
-            const API_URL = 'https://www.luvbree.com/api/image/random?categoryId=1927377837329715201&isLandscape=true&type=3&imageType=compressed';
+            const API_URL = 'https://t.alcy.cc/pc';
             fetch(API_URL)
                 .then(response => { if (!response.ok) throw new Error(); return response.json(); })
                 .then(data => {
