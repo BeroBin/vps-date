@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://npm.elemecdn.com/lxgw-wenkai-screen-webfont@1.7.0/lxgwwenkaiscreen.css">
     <style>
         body {
-            background-color: #b1cbf1;
+            background-color: #f0f4f8;
             font-family: "LXGW WenKai Screen", sans-serif;
             color: #334155;
             line-height: 1.6;
@@ -26,16 +26,15 @@
             margin-bottom: 35px;
             font-size: 1.8rem;
             font-weight: 600;
-            letter-spacing: -0.025em;
         }
 
         .stats-container {
-            background: rgba(255, 255, 255, 0.8);
+            background: #ffffff;
             border-radius: 16px;
             padding: 25px;
             margin-bottom: 25px;
-            box-shadow: 0 4px 20px rgba(46, 125, 50, 0.08);
-            border-top: 4px solid #b1cbf1;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
         }
 
         .stats-item {
@@ -51,77 +50,55 @@
             top: 25%;
             height: 50%;
             width: 1px;
-            background-color: rgba(76, 175, 80, 0.2);
+            background-color: #e2e8f0;
         }
 
         .stats-item h3 {
-            color: #66806a;
+            color: #64748b;
             font-size: 0.95rem;
             margin-bottom: 8px;
             font-weight: 500;
         }
 
         .stats-item p {
-            color: #475569;
+            color: #1e293b;
             font-size: 1.7rem;
             font-weight: 600;
             margin: 0;
         }
 
         .vps-list-container {
-            background: rgba(215, 235, 240, 0.8);
+            background: #ffffff;
             border-radius: 16px;
             padding: 30px;
-            box-shadow: 0 4px 20px rgba(46, 125, 50, 0.08);
-            border-top: 4px solid #b1cbf1;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
         }
 
         .vps-list-header {
             display: flex;
-            border-bottom: 1px solid #e0f2e1;
+            border-bottom: 1px solid #e2e8f0;
             padding-bottom: 15px;
             margin-bottom: 15px;
-            color: #66806a;
+            color: #64748b;
             font-weight: 500;
             font-size: 0.9rem;
         }
 
-        .vps-header-name {
-            flex: 1.5;
-            padding-left: 10px;
-        }
-
-        .vps-header-info {
-            flex: 4;
-            display: flex;
-        }
-
-        .vps-header-item {
-            flex: 1;
-            text-align: center;
-            padding: 0 12px;
-        }
-
-        .vps-header-status {
-            width: 90px;
-            text-align: center;
-        }
+        .vps-header-name { flex: 1.5; padding-left: 10px; }
+        .vps-header-info { flex: 4; display: flex; }
+        .vps-header-item { flex: 1; text-align: center; padding: 0 12px; }
+        .vps-header-status { width: 90px; text-align: center; }
 
         .vps-row {
             display: flex;
             align-items: center;
             padding: 15px 10px;
-            border-bottom: 1px solid rgba(224, 242, 225, 0.5);
-            transition: all 0.2s ease;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.2s ease;
         }
-
-        .vps-row:hover {
-            background-color: rgba(224, 242, 225, 0.3);
-        }
-
-        .vps-row:last-child {
-            border-bottom: none;
-        }
+        .vps-row:hover { background-color: #f8fafc; }
+        .vps-row:last-child { border-bottom: none; }
 
         .vps-name {
             flex: 1.5;
@@ -129,21 +106,13 @@
         }
 
         .vps-name a {
-            color: #2f343c;
+            color: #1e293b;
             font-weight: 500;
             font-size: 1rem;
             text-decoration: none;
-            transition: all 0.2s ease;
-            display: inline-block;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
+            transition: color 0.2s ease;
         }
-
-        .vps-name a:hover {
-            color: #4caf50;
-        }
+        .vps-name a:hover { color: #3b82f6; }
 
         .vps-info {
             flex: 4;
@@ -159,14 +128,13 @@
         }
 
         .vps-info-label {
-            color: #66806a;
+            color: #64748b;
             font-size: 0.75rem;
             margin-bottom: 3px;
-            font-weight: normal;
         }
 
         .vps-info-value {
-            color: #334155;
+            color: #1e293b;
             font-size: 0.95rem;
             font-weight: 500;
         }
@@ -176,121 +144,32 @@
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 500;
-            white-space: nowrap;
-            min-width: 80px;
             text-align: center;
             width: 90px;
         }
 
-        .status-normal {
-            background: #7edb83;
-            color: #475569;
-        }
-
-        .status-warning {
-            background: #fff8e1;
-            color: #ff8f00;
-        }
-
-        .status-danger {
-            background: #ffebee;
-            color: #c62828;
-        }
+        .status-normal { background-color: #dcfce7; color: #166534; }
+        .status-warning { background-color: #fef9c3; color: #854d0e; }
+        .status-danger { background-color: #fee2e2; color: #991b1b; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .vps-row {
-            animation: fadeIn 0.3s ease-out forwards;
-        }
+        .vps-row { animation: fadeIn 0.3s ease-out forwards; }
         
-        body.dark-theme {
-            background-color: #132c1a;
-            color: #e0f2e1;
-        }
-
-        body.dark-theme .stats-container,
-        body.dark-theme .vps-list-container {
-            background: rgba(24, 55, 24, 0.6);
-            border-color: rgba(76, 175, 80, 0.3);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        body.dark-theme .vps-list-header,
-        body.dark-theme .vps-row {
-            border-color: rgba(76, 175, 80, 0.15);
-        }
-
-        body.dark-theme .vps-row:hover {
-            background-color: rgba(76, 175, 80, 0.1);
-        }
-
-        body.dark-theme .vps-name a {
-            color: #81c784;
-        }
-
-        body.dark-theme .vps-info-value {
-            color: #e0f2e1;
-        }
-
-        body.dark-theme .vps-info-label, body.dark-theme .sort-options label {
-            color: #a5d6a7;
-        }
-
-        body.dark-theme .page-title {
-            color: #81c784;
-        }
-
-        body.dark-theme .stats-item h3 {
-            color: #a5d6a7;
-        }
-
-        body.dark-theme .stats-item p {
-            color: #81c784;
-        }
-
-        body.dark-theme .vps-name a:hover {
-            color: #a5d6a7;
-        }
-
-        body.dark-theme .status-normal {
-            background: rgba(76, 175, 80, 0.2);
-            color: #a5d6a7;
-        }
-
-        body.dark-theme .status-warning {
-            background: rgba(255, 193, 7, 0.2);
-            color: #ffd54f;
-        }
-
-        body.dark-theme .status-danger {
-            background: rgba(244, 67, 54, 0.2);
-            color: #ef9a9a;
-        }
-
         @media (max-width: 768px) {
-            .vps-list-header, .sort-options {
-                display: none;
-            }
-            .vps-row {
-                padding: 15px 10px;
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .vps-name {
-                margin-bottom: 10px;
-                text-align: center;
-                padding-right: 0;
-            }
+            .vps-list-header { display: none; }
+            .sort-options { justify-content: flex-start !important; }
+            .vps-row { flex-direction: column; align-items: stretch; }
+            .vps-name { margin-bottom: 10px; text-align: center; padding-right: 0; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <script src="exchange_rates.js"></script>
-        <h1 class="page-title">VPS到期监控</h1>
+        <h1 class="page-title">VPS 到期监控</h1>
         <div class="stats-container">
             <div class="row">
                 <div class="col-md-4 stats-item">
@@ -311,9 +190,9 @@
         <div class="d-flex justify-content-end align-items-center mb-3 sort-options">
             <label for="sortSelector" class="form-label me-2 mb-0 fw-bold">排序方式:</label>
             <select class="form-select form-select-sm" id="sortSelector" style="width: auto;">
-                <option value="expiry">按到期日 (升序)</option>
-                <option value="price_desc">按单价 (降序)</option>
+                <option value="price_desc" selected>按单价 (降序)</option>
                 <option value="price_asc">按单价 (升序)</option>
+                <option value="expiry">按到期日 (升序)</option>
             </select>
         </div>
 
@@ -329,8 +208,8 @@
             </div>
             
             <div id="vpsRows">
-                <div class="text-center" id="loadingMessage">
-                    <div class="spinner-border text-success" role="status">
+                <div class="text-center p-5" id="loadingMessage">
+                    <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">加载中...</span>
                     </div>
                 </div>
@@ -389,7 +268,7 @@
         "url": "https://bytevirt.com/clientarea.php?action=productdetails&id=20339"
     },
     {
-        "name": "CCS-Black Friday (2023) Specials",
+        "name": "Colocrossing-Black Friday (2023) Specials",
         "cost": 15.0,
         "currency": "USD",
         "billingCycle": "Annually",
@@ -443,7 +322,7 @@
             'Annually': '年付', 'Biennially': '2年付', 'Triennially': '3年付'
         };
 
-        let currentSortMethod = 'expiry';
+        let currentSortMethod = 'price_desc';
 
         function formatDate(date) {
             return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -462,8 +341,9 @@
             const parsedAmount = parseFloat(amount);
             if (isNaN(parsedAmount)) return 0;
             if (currency === 'CNY') return parsedAmount;
-            if (window.exchangeRates && window.exchangeRates[currency]) {
-                return parsedAmount / window.exchangeRates[currency];
+            // 使用全局的 exchangeRates 对象，不再需要 'window.' 前缀
+            if (exchangeRates && exchangeRates[currency]) {
+                return parsedAmount / exchangeRates[currency];
             }
             return 0;
         }
@@ -484,6 +364,16 @@
         }
 
         function updateVPSRows() {
+            // 在每次更新时都检查汇率对象是否存在，增强了健壮性
+            if (typeof exchangeRates === 'undefined' || Object.keys(exchangeRates).length === 0) {
+                console.warn("exchange_rates.js 未加载或为空，将使用内置的备用汇率。");
+                // 定义一个备用汇率对象，确保在主汇率文件加载失败时程序依然能运行
+                window.exchangeRates = { 
+                    'CNY': 1, 'USD': 0.138, 'EUR': 0.128, 'HKD': 1.08, 
+                    'JPY': 21.7, 'GBP': 0.11, 'AUD': 0.21
+                };
+            }
+
             const container = document.getElementById('vpsRows');
             
             const sortedServices = [...vpsServices].sort((a, b) => {
@@ -509,7 +399,7 @@
             let totalMonthlyCostCNY = 0;
             let expiringCount = 0;
 
-            const rowsHTML = sortedServices.map(service => {
+            const rowsHTML = sortedServices.map((service, index) => {
                 const daysLeft = calculateDaysUntilExpire(service);
                 
                 const monthlyCost = normalizeToMonthlyCost(service.cost, service.billingCycle);
@@ -522,17 +412,16 @@
 
                 let statusClass = 'status-normal';
                 if (typeof daysLeft === 'number' && daysLeft <= 7) {
-                    if (daysLeft <= 3) statusClass = 'status-danger';
-                    else statusClass = 'status-warning';
+                    statusClass = daysLeft <= 3 ? 'status-danger' : 'status-warning';
                 }
 
                 const cycleDisplayName = billingCycleNames[service.billingCycle] || service.billingCycle;
                 const expireDateText = service.nextDueDate ? formatDate(new Date(service.nextDueDate)) : 'N/A';
 
                 return `
-                    <div class="vps-row" style="opacity:0; animation-delay: ${sortedServices.indexOf(service) * 0.05}s">
+                    <div class="vps-row" style="opacity:0; animation-delay: ${index * 0.05}s">
                         <div class="vps-name">
-                            <a href="${service.url || '#'}" target="_blank">${service.name}</a>
+                            <a href="${service.url || '#'}" target="_blank" title="${service.name}">${service.name}</a>
                         </div>
                         <div class="vps-info">
                             <div class="vps-info-item">
@@ -555,7 +444,7 @@
                 `;
             }).join('');
 
-            container.innerHTML = rowsHTML || '<p class="text-center">暂无VPS数据。</p>';
+            container.innerHTML = rowsHTML || '<p class="text-center p-4">暂无VPS数据。</p>';
             document.getElementById('totalCost').textContent = `¥${totalMonthlyCostCNY.toFixed(2)}`;
             document.getElementById('serverCount').textContent = vpsServices.length;
             document.getElementById('expiringCount').textContent = expiringCount;
@@ -563,18 +452,15 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const sortSelector = document.getElementById('sortSelector');
+            // 从选择器读取默认排序方式
             currentSortMethod = sortSelector.value;
-
-            if (typeof exchangeRates === 'undefined') {
-                console.warn("exchange_rates.js 未加载或为空，使用默认汇率。");
-                window.exchangeRates = { 'USD': 1/7.1, 'EUR': 1/7.7, 'CNY': 1, 'HKD': 1/0.9 };
-            }
             
             sortSelector.addEventListener('change', (event) => {
                 currentSortMethod = event.target.value;
                 updateVPSRows();
             });
 
+            // 首次加载时更新行
             updateVPSRows();
         });
     </script>
