@@ -3,465 +3,432 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VPS到期监控</title>
+    <title>VPS 到期监控</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://npm.elemecdn.com/lxgw-wenkai-screen-webfont@1.7.0/lxgwwenkaiscreen.css">
     <style>
+        :root {
+            --card-bg-color: rgba(255, 255, 255, 0.6);
+            --text-color: #334155;
+            --label-color: #64748b;
+            --title-color: #1e293b;
+            --border-color: rgba(255, 255, 255, 0.25);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --border-radius-lg: 20px;
+            --border-radius-md: 16px;
+        }
+
         body {
-            background-color: #f0f4f8;
             font-family: "LXGW WenKai Screen", sans-serif;
-            color: #334155;
-            line-height: 1.6;
+            color: var(--text-color);
+            line-height: 1.7;
+            /* 备用渐变背景，在图片加载失败时生效 */
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            transition: background-image 1s ease-in-out;
+            min-height: 100vh;
+        }
+
+        .backdrop-filter {
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            backdrop-filter: blur(20px) saturate(160%);
+            background: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px 0 var(--shadow-color);
         }
 
         .container {
             max-width: 1200px;
-            padding-top: 40px;
-            padding-bottom: 60px;
+            padding-top: 5vh;
+            padding-bottom: 5vh;
         }
 
         .page-title {
-            color: #475569;
+            color: #fff;
             text-align: center;
-            margin-bottom: 35px;
-            font-size: 1.8rem;
-            font-weight: 600;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.25);
         }
-
+        
         .stats-container {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
+            border-radius: var(--border-radius-lg);
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
         }
 
-        .stats-item {
-            text-align: center;
-            padding: 15px 10px;
-            position: relative;
-        }
-
-        .stats-item:not(:last-child):after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 25%;
-            height: 50%;
-            width: 1px;
-            background-color: #e2e8f0;
-        }
-
-        .stats-item h3 {
-            color: #64748b;
-            font-size: 0.95rem;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .stats-item p {
-            color: #1e293b;
-            font-size: 1.7rem;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .vps-list-container {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
-        }
-
-        .vps-list-header {
+        .stats-grid {
             display: flex;
-            border-bottom: 1px solid #e2e8f0;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-            color: #64748b;
-            font-weight: 500;
-            font-size: 0.9rem;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
         }
 
-        .vps-header-name { flex: 1.5; padding-left: 10px; }
-        .vps-header-info { flex: 4; display: flex; }
-        .vps-header-item { flex: 1; text-align: center; padding: 0 12px; }
-        .vps-header-status { width: 90px; text-align: center; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--title-color); }
+        .stat-label { font-size: 0.9rem; color: var(--label-color); }
+        
+        .controls-header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+        
+        .controls-header label {
+            color: #f1f5f9;
+            font-weight: 500;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+            margin-right: 10px;
+        }
 
-        .vps-row {
+        #sortSelector {
+            background-color: rgba(255,255,255,0.7);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .vps-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+            gap: 1.8rem;
+        }
+
+        .vps-card {
+            border-radius: var(--border-radius-md);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            padding: 1.5rem;
+        }
+
+        .vps-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.25);
+        }
+
+        .vps-card-header {
             display: flex;
             align-items: center;
-            padding: 15px 10px;
-            border-bottom: 1px solid #f1f5f9;
-            transition: background-color 0.2s ease;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
         }
-        .vps-row:hover { background-color: #f8fafc; }
-        .vps-row:last-child { border-bottom: none; }
 
         .vps-name {
-            flex: 1.5;
-            padding-right: 12px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--title-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-
-        .vps-name a {
-            color: #1e293b;
-            font-weight: 500;
-            font-size: 1rem;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-        .vps-name a:hover { color: #3b82f6; }
-
-        .vps-info {
-            flex: 4;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .vps-info-item {
-            padding: 0 12px;
-            flex: 1;
-            text-align: center;
-        }
-
-        .vps-info-label {
-            color: #64748b;
-            font-size: 0.75rem;
-            margin-bottom: 3px;
-        }
-
-        .vps-info-value {
-            color: #1e293b;
-            font-size: 0.95rem;
-            font-weight: 500;
-        }
-
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            text-align: center;
-            width: 90px;
-        }
-
-        .status-normal { background-color: #dcfce7; color: #166534; }
-        .status-warning { background-color: #fef9c3; color: #854d0e; }
-        .status-danger { background-color: #fee2e2; color: #991b1b; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .vps-row { animation: fadeIn 0.3s ease-out forwards; }
         
-        @media (max-width: 768px) {
-            .vps-list-header { display: none; }
-            .sort-options { justify-content: flex-start !important; }
-            .vps-row { flex-direction: column; align-items: stretch; }
-            .vps-name { margin-bottom: 10px; text-align: center; padding-right: 0; }
+        .vps-name a { color: inherit; text-decoration: none; }
+        .vps-name a:hover { text-decoration: underline; }
+
+        .vps-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+            font-size: 0.95rem;
         }
+        
+        .vps-info-label { color: var(--label-color); font-size: 0.85rem; margin-bottom: 2px; }
+        .vps-info-value { font-weight: 500; color: var(--text-color); }
+        
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: -40px;
+            width: 140px;
+            transform: rotate(45deg);
+            padding: 3px 0;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .status-badge.status-normal { background-color: #48bb78; }
+        .status-badge.status-warning { background-color: #f59e0b; }
+        .status-badge.status-danger { background-color: #ef4444; }
+
     </style>
 </head>
 <body>
     <div class="container">
-        <script src="exchange_rates.js"></script>
-        <h1 class="page-title">VPS 到期监控</h1>
-        <div class="stats-container">
+        <h1 class="page-title">VPS Status Dashboard</h1>
+
+        <div class="stats-container backdrop-filter">
             <div class="row">
-                <div class="col-md-4 stats-item">
-                    <h3>服务器总数</h3>
-                    <p id="serverCount">--</p>
+                <div class="col-md-4 col-sm-12 stat-item my-2">
+                    <div id="serverCount" class="stat-value">0</div>
+                    <div class="stat-label">服务器总数</div>
                 </div>
-                <div class="col-md-4 stats-item">
-                    <h3>月度总支出</h3>
-                    <p id="totalCost">--</p>
+                <div class="col-md-4 col-sm-12 stat-item my-2">
+                    <div id="totalCost" class="stat-value">¥0.00</div>
+                    <div class="stat-label">月度总支出</div>
                 </div>
-                <div class="col-md-4 stats-item">
-                    <h3>即将到期 (7天内)</h3>
-                    <p id="expiringCount">--</p>
+                <div class="col-md-4 col-sm-12 stat-item my-2">
+                    <div id="expiringCount" class="stat-value">0</div>
+                    <div class="stat-label">即将到期 (7天内)</div>
                 </div>
             </div>
         </div>
-        
-        <div class="d-flex justify-content-end align-items-center mb-3 sort-options">
-            <label for="sortSelector" class="form-label me-2 mb-0 fw-bold">排序方式:</label>
-            <select class="form-select form-select-sm" id="sortSelector" style="width: auto;">
-                <option value="price_desc" selected>按单价 (降序)</option>
+
+        <div class="controls-header">
+            <label for="sortSelector">排序方式:</label>
+            <select id="sortSelector" class="form-select form-select-sm" style="width: auto;">
+                <option value="price_desc">按单价 (降序)</option>
                 <option value="price_asc">按单价 (升序)</option>
                 <option value="expiry">按到期日 (升序)</option>
             </select>
         </div>
 
-        <div class="vps-list-container">
-            <div class="vps-list-header">
-                <div class="vps-header-name">服务器名称</div>
-                <div class="vps-header-info">
-                    <div class="vps-header-item">费用</div>
-                    <div class="vps-header-item">月度单价 (CNY)</div>
-                    <div class="vps-header-item">到期时间</div>
-                </div>
-                <div class="vps-header-status">剩余天数</div>
+        <div id="vpsList" class="vps-list">
             </div>
-            
-            <div id="vpsRows">
-                <div class="text-center p-5" id="loadingMessage">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">加载中...</span>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
-
+    
     <script>
+        // --- DATA (已从您的文件中恢复) ---
         const vpsServices = [
-    {
-        "name": "BWG-NODESEEK-MEGABOX-PRO",
-        "cost": 45.68,
-        "currency": "USD",
-        "billingCycle": "Annually",
-        "nextDueDate": "2026-05-26",
-        "url": "https://bandwagonhost.com/services"
-    },
-    {
-        "name": "Akile-HKS-BlindBox-Starter",
-        "cost": 169.9,
-        "currency": "CNY",
-        "billingCycle": "Annually",
-        "nextDueDate": "2025-12-03",
-        "url": "https://akile.io/console"
-    },
-    {
-        "name": "CNF-HKL Special",
-        "cost": 100.0,
-        "currency": "HKD",
-        "billingCycle": "Annually",
-        "nextDueDate": "2026-05-24",
-        "url": "https://cnfaster.com/productdetail.htm?id=1963"
-    },
-    {
-        "name": "uqidc-香港荃湾-1G",
-        "cost": 99.0,
-        "currency": "CNY",
-        "billingCycle": "Annually",
-        "nextDueDate": "2026-05-26",
-        "url": "https://www.uqidc.com/servicedetail?id=20713"
-    },
-    {
-        "name": "LegendVPS-US-NYC-1G US NYC",
-        "cost": 0.5,
-        "currency": "USD",
-        "billingCycle": "Monthly",
-        "nextDueDate": "2025-07-18",
-        "url": "https://legendvps.com/clientarea.php?action=productdetails&id=5736"
-    },
-    {
-        "name": "Bytevirt-LA-China Optimized",
-        "cost": 24.0,
-        "currency": "USD",
-        "billingCycle": "Annually",
-        "nextDueDate": "2026-02-11",
-        "url": "https://bytevirt.com/clientarea.php?action=productdetails&id=20339"
-    },
-    {
-        "name": "Colocrossing-Black Friday (2023) Specials",
-        "cost": 15.0,
-        "currency": "USD",
-        "billingCycle": "Annually",
-        "nextDueDate": "2026-03-04",
-        "url": "https://cloud.colocrossing.com/clientarea.php?action=productdetails&id=7448"
-    },
-    {
-        "name": "Scaleway-PAR1",
-        "cost": 0.13,
-        "currency": "EUR",
-        "billingCycle": "Monthly",
-        "nextDueDate": "2099-12-12",
-        "url": "https://console.scaleway.com/instance/servers"
-    },
-    {
-        "name": "CLAW-HK",
-        "cost": 8.4,
-        "currency": "USD",
-        "billingCycle": "Quarterly",
-        "nextDueDate": "2025-07-22",
-        "url": "https://claw.cloud/clientarea.php?action=productdetails&id=7772"
-    },
-    {
-        "name": "CLAW-JP",
-        "cost": 7.0,
-        "currency": "USD",
-        "billingCycle": "Annually",
-        "nextDueDate": "2026-01-23",
-        "url": "https://claw.cloud/clientarea.php?action=productdetails&id=33367"
-    },
-    {
-        "name": "WAWO-HKd-ipv6-0.5G-2台",
-        "cost": 31.8,
-        "currency": "CNY",
-        "billingCycle": "Annually",
-        "nextDueDate": "2025-10-21",
-        "url": "https://wawo.wiki/clientarea.php?action=productdetails&id=6764"
-    },
-    {
-        "name": "Mitce-airport",
-        "cost": 4.9,
-        "currency": "USD",
-        "billingCycle": "Annually",
-        "nextDueDate": "2026-07-06",
-        "url": "https://mitce.net/clientarea.php?action=productdetails&id=278418"
-    }
-];
-        
+            {
+                "name": "BWG-NODESEEK-MEGABOX-PRO",
+                "cost": 45.68,
+                "currency": "USD",
+                "billingCycle": "Annually",
+                "nextDueDate": "2026-05-26",
+                "url": "https://bandwagonhost.com/services"
+            },
+            {
+                "name": "Akile-HKS-BlindBox-Starter",
+                "cost": 169.9,
+                "currency": "CNY",
+                "billingCycle": "Annually",
+                "nextDueDate": "2025-12-03",
+                "url": "https://akile.io/console"
+            },
+            {
+                "name": "CNF-HKL Special",
+                "cost": 100.0,
+                "currency": "HKD",
+                "billingCycle": "Annually",
+                "nextDueDate": "2026-05-24",
+                "url": "https://cnfaster.com/productdetail.htm?id=1963"
+            },
+            {
+                "name": "uqidc-香港荃湾-1G",
+                "cost": 99.0,
+                "currency": "CNY",
+                "billingCycle": "Annually",
+                "nextDueDate": "2026-05-26",
+                "url": "https://www.uqidc.com/servicedetail?id=20713"
+            },
+            {
+                "name": "LegendVPS-US-NYC-1G US NYC",
+                "cost": 0.5,
+                "currency": "USD",
+                "billingCycle": "Monthly",
+                "nextDueDate": "2025-07-18",
+                "url": "https://legendvps.com/clientarea.php?action=productdetails&id=5736"
+            },
+            {
+                "name": "Bytevirt-LA-China Optimized",
+                "cost": 24.0,
+                "currency": "USD",
+                "billingCycle": "Annually",
+                "nextDueDate": "2026-02-11",
+                "url": "https://bytevirt.com/clientarea.php?action=productdetails&id=20339"
+            },
+            {
+                "name": "Colocrossing-Black Friday (2023) Specials",
+                "cost": 15.0,
+                "currency": "USD",
+                "billingCycle": "Annually",
+                "nextDueDate": "2026-03-04",
+                "url": "https://cloud.colocrossing.com/clientarea.php?action=productdetails&id=7448"
+            },
+            {
+                "name": "Scaleway-PAR1",
+                "cost": 0.13,
+                "currency": "EUR",
+                "billingCycle": "Monthly",
+                "nextDueDate": "2099-12-12",
+                "url": "https://console.scaleway.com/instance/servers"
+            },
+            {
+                "name": "CLAW-HK",
+                "cost": 8.4,
+                "currency": "USD",
+                "billingCycle": "Quarterly",
+                "nextDueDate": "2025-07-22",
+                "url": "https://claw.cloud/clientarea.php?action=productdetails&id=7772"
+            },
+            {
+                "name": "CLAW-JP",
+                "cost": 7.0,
+                "currency": "USD",
+                "billingCycle": "Annually",
+                "nextDueDate": "2026-01-23",
+                "url": "https://claw.cloud/clientarea.php?action=productdetails&id=33367"
+            },
+            {
+                "name": "WAWO-HKd-ipv6-0.5G-2台",
+                "cost": 31.8,
+                "currency": "CNY",
+                "billingCycle": "Annually",
+                "nextDueDate": "2025-10-21",
+                "url": "https://wawo.wiki/clientarea.php?action=productdetails&id=6764"
+            },
+            {
+                "name": "Mitce-airport",
+                "cost": 4.9,
+                "currency": "USD",
+                "billingCycle": "Annually",
+                "nextDueDate": "2026-07-06",
+                "url": "https://mitce.net/clientarea.php?action=productdetails&id=278418"
+            }
+        ];
+
+        // 沿用您原有的逻辑和数据结构
         const billingCycleNames = {
             'Monthly': '月付', 'Quarterly': '季度付', 'Semi-Annually': '半年付',
             'Annually': '年付', 'Biennially': '2年付', 'Triennially': '3年付'
         };
+        const exchangeRates = { 
+            'CNY': 1, 'USD': 0.138, 'EUR': 0.128, 'HKD': 1.08, 
+            'JPY': 21.7, 'GBP': 0.11, 'AUD': 0.21
+        };
 
         let currentSortMethod = 'price_desc';
 
+        // --- Core Functions (保留您原有的计算逻辑) ---
         function formatDate(date) {
-            return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
         }
-
         function calculateDaysUntilExpire(service) {
             if (!service.nextDueDate) return 'N/A';
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const expireDate = new Date(service.nextDueDate);
-            expireDate.setHours(0, 0, 0, 0);
             return Math.ceil((expireDate - today) / (1000 * 60 * 60 * 24));
         }
-
         function convertToCNY(amount, currency) {
             const parsedAmount = parseFloat(amount);
             if (isNaN(parsedAmount)) return 0;
             if (currency === 'CNY') return parsedAmount;
-            // 使用全局的 exchangeRates 对象，不再需要 'window.' 前缀
-            if (exchangeRates && exchangeRates[currency]) {
-                return parsedAmount / exchangeRates[currency];
-            }
+            if (exchangeRates[currency]) return parsedAmount / exchangeRates[currency];
             return 0;
         }
-
         function normalizeToMonthlyCost(cost, billingCycle) {
             const parsedCost = parseFloat(cost);
             if (isNaN(parsedCost)) return 0;
-            switch(billingCycle) {
-                case 'Quarterly': return parsedCost / 3;
-                case 'Semi-Annually': return parsedCost / 6;
-                case 'Annually': return parsedCost / 12;
-                case 'Biennially': return parsedCost / 24;
-                case 'Triennially': return parsedCost / 36;
-                case 'Monthly':
-                default:
-                    return parsedCost;
-            }
+            const cycles = { 'Quarterly': 3, 'Semi-Annually': 6, 'Annually': 12, 'Biennially': 24, 'Triennially': 36 };
+            return cycles[billingCycle] ? parsedCost / cycles[billingCycle] : parsedCost;
         }
 
-        function updateVPSRows() {
-            // 在每次更新时都检查汇率对象是否存在，增强了健壮性
-            if (typeof exchangeRates === 'undefined' || Object.keys(exchangeRates).length === 0) {
-                console.warn("exchange_rates.js 未加载或为空，将使用内置的备用汇率。");
-                // 定义一个备用汇率对象，确保在主汇率文件加载失败时程序依然能运行
-                window.exchangeRates = { 
-                    'CNY': 1, 'USD': 0.138, 'EUR': 0.128, 'HKD': 1.08, 
-                    'JPY': 21.7, 'GBP': 0.11, 'AUD': 0.21
-                };
-            }
-
-            const container = document.getElementById('vpsRows');
+        // --- Main Rendering Function (适配新的卡片式UI) ---
+        function updateVPSCards() {
+            const container = document.getElementById('vpsList');
+            currentSortMethod = document.getElementById('sortSelector').value;
             
             const sortedServices = [...vpsServices].sort((a, b) => {
                 if (currentSortMethod === 'expiry') {
-                    const daysA = calculateDaysUntilExpire(a);
-                    const daysB = calculateDaysUntilExpire(b);
-                    if (typeof daysA !== 'number') return 1;
-                    if (typeof daysB !== 'number') return -1;
-                    return daysA - daysB;
+                    return calculateDaysUntilExpire(a) - calculateDaysUntilExpire(b);
                 } else {
-                    const monthlyCostA = normalizeToMonthlyCost(a.cost, a.billingCycle);
-                    const monthlyCostInCNY_A = convertToCNY(monthlyCostA, a.currency);
-                    
-                    const monthlyCostB = normalizeToMonthlyCost(b.cost, b.billingCycle);
-                    const monthlyCostInCNY_B = convertToCNY(monthlyCostB, b.currency);
-
-                    return currentSortMethod === 'price_asc' 
-                        ? monthlyCostInCNY_A - monthlyCostInCNY_B
-                        : monthlyCostInCNY_B - monthlyCostInCNY_A;
+                    const costA = convertToCNY(normalizeToMonthlyCost(a.cost, a.billingCycle), a.currency);
+                    const costB = convertToCNY(normalizeToMonthlyCost(b.cost, b.billingCycle), b.currency);
+                    return currentSortMethod === 'price_asc' ? costA - costB : costB - costA;
                 }
             });
 
             let totalMonthlyCostCNY = 0;
             let expiringCount = 0;
 
-            const rowsHTML = sortedServices.map((service, index) => {
+            const cardsHTML = sortedServices.map(service => {
                 const daysLeft = calculateDaysUntilExpire(service);
-                
-                const monthlyCost = normalizeToMonthlyCost(service.cost, service.billingCycle);
-                const monthlyCostInCNY = convertToCNY(monthlyCost, service.currency);
+                const monthlyCostInCNY = convertToCNY(normalizeToMonthlyCost(service.cost, service.billingCycle), service.currency);
                 totalMonthlyCostCNY += monthlyCostInCNY;
                 
-                if (typeof daysLeft === 'number' && daysLeft <= 7) {
-                    expiringCount++;
-                }
-
                 let statusClass = 'status-normal';
                 if (typeof daysLeft === 'number' && daysLeft <= 7) {
+                    expiringCount++;
                     statusClass = daysLeft <= 3 ? 'status-danger' : 'status-warning';
                 }
 
                 const cycleDisplayName = billingCycleNames[service.billingCycle] || service.billingCycle;
                 const expireDateText = service.nextDueDate ? formatDate(new Date(service.nextDueDate)) : 'N/A';
+                const daysLeftText = typeof daysLeft === 'number' ? `${daysLeft} 天后` : 'N/A';
+                if(daysLeft < 0) daysLeftText = '已过期';
 
                 return `
-                    <div class="vps-row" style="opacity:0; animation-delay: ${index * 0.05}s">
-                        <div class="vps-name">
-                            <a href="${service.url || '#'}" target="_blank" title="${service.name}">${service.name}</a>
+                    <div class="vps-card backdrop-filter">
+                        <div class="vps-card-header">
+                           <div class="vps-name" title="${service.name}">
+                                <a href="${service.url || '#'}" target="_blank">${service.name}</a>
+                           </div>
                         </div>
-                        <div class="vps-info">
-                            <div class="vps-info-item">
-                                <div class="vps-info-label">${cycleDisplayName}</div>
+                        <div class="vps-info-grid">
+                            <div>
+                                <div class="vps-info-label">费用 (${cycleDisplayName})</div>
                                 <div class="vps-info-value">${service.cost} ${service.currency}</div>
                             </div>
-                            <div class="vps-info-item">
+                             <div>
                                 <div class="vps-info-label">月度单价</div>
                                 <div class="vps-info-value">${monthlyCostInCNY ? '¥' + monthlyCostInCNY.toFixed(2) : 'N/A'}</div>
                             </div>
-                            <div class="vps-info-item">
+                            <div>
                                 <div class="vps-info-label">到期时间</div>
                                 <div class="vps-info-value">${expireDateText}</div>
                             </div>
+                             <div>
+                                <div class="vps-info-label">剩余</div>
+                                <div class="vps-info-value">${daysLeftText}</div>
+                            </div>
                         </div>
-                        <div class="status-badge ${statusClass}">
-                            ${typeof daysLeft === 'number' ? `${daysLeft} 天` : daysLeft}
-                        </div>
+                        <div class="status-badge ${statusClass}"></div>
                     </div>
                 `;
             }).join('');
 
-            container.innerHTML = rowsHTML || '<p class="text-center p-4">暂无VPS数据。</p>';
+            container.innerHTML = cardsHTML || '<p class="text-center p-4">暂无VPS数据。</p>';
             document.getElementById('totalCost').textContent = `¥${totalMonthlyCostCNY.toFixed(2)}`;
             document.getElementById('serverCount').textContent = vpsServices.length;
             document.getElementById('expiringCount').textContent = expiringCount;
         }
 
+        // --- Event Listeners & Initial Load ---
         document.addEventListener('DOMContentLoaded', () => {
-            const sortSelector = document.getElementById('sortSelector');
-            // 从选择器读取默认排序方式
-            currentSortMethod = sortSelector.value;
-            
-            sortSelector.addEventListener('change', (event) => {
-                currentSortMethod = event.target.value;
-                updateVPSRows();
-            });
+            const API_URL = 'https://www.luvbree.com/api/image/random?categoryId=1927377837329715201&isLandscape=true&type=3&imageType=compressed';
 
-            // 首次加载时更新行
-            updateVPSRows();
+            fetch(API_URL)
+                .then(response => {
+                    if (!response.ok) throw new Error(`API网络响应失败: ${response.statusText}`);
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.url) {
+                        const img = new Image();
+                        img.src = data.url;
+                        img.onload = () => document.body.style.backgroundImage = `url(${img.src})`;
+                    } else {
+                        throw new Error("API响应数据格式不正确");
+                    }
+                })
+                .catch(err => {
+                    console.error("加载二次元壁纸失败，已启用备用渐变背景:", err);
+                });
+            
+            document.getElementById('sortSelector').addEventListener('change', updateVPSCards);
+            updateVPSCards();
         });
     </script>
 </body>
