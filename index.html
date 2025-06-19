@@ -331,15 +331,45 @@
 
         // --- Event Listeners & Initial Load ---
         document.addEventListener('DOMContentLoaded', () => {
-            const API_URL = 'https://api.waifu.pics/sfw/waifu';
-            fetch(API_URL)
-                .then(response => { if (!response.ok) throw new Error(); return response.json(); })
-                .then(data => {
-                    const img = new Image();
-                    img.src = data.url;
-                    img.onload = () => document.body.style.backgroundImage = `url(${img.src})`;
-                })
-                .catch(err => { console.error("加载二次元壁纸失败，已启用备用渐变背景:", err); });
+            // --- 背景图片 API 选择 ---
+            // 您可以选择以下任意一个API作为背景图片源。
+            // 默认使用 Bing UHD 图片。
+            const BACKGROUND_API_URL = 'https://t.alcy.cc/pc'; // Bing UHD daily wallpaper (Direct image) https://bing.img.run/uhd.php
+
+            // 备用API (二次元图片，直接返回图片):
+            // const BACKGROUND_API_URL = 'https://api.mtyqx.cn/tapi/random.php';
+            // const BACKGROUND_API_URL = 'https://t.alcy.cc/pc';
+
+            // 如果你想用回原来的waifu.pics (它返回JSON，需要解析):
+            // const BACKGROUND_API_URL = 'https://api.waifu.pics/sfw/waifu';
+            // fetch(BACKGROUND_API_URL)
+            //     .then(response => { if (!response.ok) throw new Error(); return response.json(); })
+            //     .then(data => {
+            //         const img = new Image();
+            //         img.src = data.url; // 注意这里是 data.url
+            //         img.onload = () => document.body.style.backgroundImage = `url(${img.src})`;
+            //     })
+            //     .catch(err => { console.error("加载二次元壁纸失败，已启用备用渐变背景:", err); });
+
+
+            // 对于直接返回图片的API，可以直接设置img.src
+            const img = new Image();
+            img.src = BACKGROUND_API_URL;
+            img.onload = () => {
+                document.body.style.backgroundImage = `url(${img.src})`;
+                // 确保图片加载后，移除可能存在的渐变背景（可选，但更干净）
+                document.body.style.background = `url(${img.src}) no-repeat center center fixed`;
+                document.body.style.backgroundSize = 'cover';
+            };
+            img.onerror = () => {
+                console.error("加载壁纸失败，已启用备用渐变背景.");
+                // 在图片加载失败时，确保使用CSS中定义的渐变背景
+                document.body.style.backgroundImage = 'none'; // 移除可能错误的图片路径
+                document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'; // 重新应用渐变
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundAttachment = 'fixed';
+            };
             
             document.getElementById('sortSelector').addEventListener('change', updateVPSCards);
             updateVPSCards();
