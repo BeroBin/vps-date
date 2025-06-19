@@ -331,7 +331,7 @@
 
         // --- Event Listeners & Initial Load ---
         document.addEventListener('DOMContentLoaded', () => {
-            const API_URL = 'https://t.alcy.cc/pc';
+            const API_URL = 'https://www.luvbree.com/api/daily-image/today/landscape';
             fetch(API_URL)
                 .then(response => { if (!response.ok) throw new Error(); return response.json(); })
                 .then(data => {
