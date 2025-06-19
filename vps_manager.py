@@ -50,7 +50,7 @@ class NotificationManager:
             chat_id = self.config['telegram']['chat_id']
             
             # 添加详情链接到消息末尾
-            base_url = self.config.get('web_dashboard_url', 'https://BeroBin.github.io/vps-date')
+            base_url = self.config.get('web_dashboard_url', 'https://github.com/BeroBin/vps-date')
             message += f"\n\n👉 查看详情：{base_url}"
             
             # 发送消息到Telegram
@@ -71,7 +71,37 @@ class VPSManager:
     def __init__(self):
         self.vps_file = 'index.html'
         self.vps_data = self.load_vps_data()
-        self.currencies = ['USD', 'EUR', 'CNY', 'CAD']
+        # 扩展币种列表，包含更多常用货币
+        self.currencies = [
+            'USD',  # 美元
+            'EUR',  # 欧元
+            'CNY',  # 人民币
+            'CAD',  # 加元
+            'HKD',  # 港币
+            'JPY',  # 日元
+            'GBP',  # 英镑
+            'AUD',  # 澳元
+            'SGD',  # 新加坡元
+            'KRW',  # 韩元
+            'TWD',  # 新台币
+            'RUB',  # 俄罗斯卢布
+            'CHF',  # 瑞士法郎
+            'SEK',  # 瑞典克朗
+            'NOK',  # 挪威克朗
+            'DKK',  # 丹麦克朗
+            'THB',  # 泰铢
+            'MYR',  # 马来西亚林吉特
+            'INR',  # 印度卢比
+            'BRL',  # 巴西雷亚尔
+        ]
+        # 币种中文名称映射
+        self.currency_names = {
+            'USD': '美元', 'EUR': '欧元', 'CNY': '人民币', 'CAD': '加元',
+            'HKD': '港币', 'JPY': '日元', 'GBP': '英镑', 'AUD': '澳元',
+            'SGD': '新加坡元', 'KRW': '韩元', 'TWD': '新台币', 'RUB': '俄罗斯卢布',
+            'CHF': '瑞士法郎', 'SEK': '瑞典克朗', 'NOK': '挪威克朗', 'DKK': '丹麦克朗',
+            'THB': '泰铢', 'MYR': '马来西亚林吉特', 'INR': '印度卢比', 'BRL': '巴西雷亚尔'
+        }
         self.exchange_rates = {}  # 添加汇率存储
         self.notification = NotificationManager()
 
@@ -114,13 +144,51 @@ class VPSManager:
         except Exception as e:
             print(f"\n保存失败: {e}")
 
+    def display_currencies(self):
+        """分页显示货币选择"""
+        print("\n可选币种:")
+        print("-" * 60)
+        for i, curr in enumerate(self.currencies, 1):
+            name = self.currency_names.get(curr, curr)
+            print(f"{i:2d}.{curr} ({name})", end="  ")
+            if i % 4 == 0:  # 每行显示4个
+                print()
+        if len(self.currencies) % 4 != 0:
+            print()
+        print("-" * 60)
+
+    def select_currency(self, current_currency=None):
+        """选择货币的通用函数"""
+        self.display_currencies()
+        
+        prompt = f"\n请选择币种"
+        if current_currency:
+            prompt += f" (当前: {current_currency} - {self.currency_names.get(current_currency, current_currency)})"
+        prompt += ": "
+        
+        try:
+            curr_input = input(prompt)
+            if not curr_input and current_currency:
+                return current_currency  # 保持原值
+            
+            curr_idx = int(curr_input) - 1
+            if 0 <= curr_idx < len(self.currencies):
+                return self.currencies[curr_idx]
+            else:
+                print("无效的币种选择！")
+                return None
+        except ValueError:
+            print("输入格式无效！")
+            return None
+
     def list_vps(self):
         print("\nVPS列表:")
-        print("-" * 60)
+        print("-" * 80)
         for i, vps in enumerate(self.vps_data, 1):
             expire_info = vps.get('expireDate', f"每月{vps.get('monthlyExpireDay')}号续费")
-            print(f"{i}. {vps['name']} - {vps['cost']} {vps['currency']} - 到期: {expire_info}")
-        print("-" * 60)
+            currency_name = self.currency_names.get(vps['currency'], vps['currency'])
+            print(f"{i:2d}. {vps['name']:<20} - {vps['cost']:>8} {vps['currency']} ({currency_name}) - 到期: {expire_info}")
+        print("-" * 80)
 
     def edit_vps(self):
         self.list_vps()
@@ -150,18 +218,9 @@ class VPSManager:
                     print("费用格式无效，保持原值")
             
             # Currency selection
-            print("\n可选币种:", end='')
-            for i, curr in enumerate(self.currencies, 1):
-                print(f" {i}.{curr}", end='')
-            print('')
-            curr_input = input(f"\n请选择币种 (当前: {vps['currency']}): ")
-            if curr_input:
-                try:
-                    curr_idx = int(curr_input) - 1
-                    if 0 <= curr_idx < len(self.currencies):
-                        changes['currency'] = self.currencies[curr_idx]
-                except ValueError:
-                    print("币种选择无效，保持原值")
+            new_currency = self.select_currency(vps['currency'])
+            if new_currency and new_currency != vps['currency']:
+                changes['currency'] = new_currency
             
             # Expiry date
             if 'expireDate' in vps:
@@ -217,19 +276,8 @@ class VPSManager:
                 return
             
             # Currency selection
-            print("\n可选币种:", end='')
-            for i, curr in enumerate(self.currencies, 1):
-                print(f" {i}.{curr}", end='')
-            print('')
-            
-            try:
-                curr_idx = int(input("\n请选择币种: ")) - 1
-                if not (0 <= curr_idx < len(self.currencies)):
-                    print("无效的币种选择！")
-                    return
-                currency = self.currencies[curr_idx]
-            except ValueError:
-                print("选择无效！")
+            currency = self.select_currency()
+            if not currency:
                 return
             
             # Expiry info
@@ -321,8 +369,8 @@ class VPSManager:
         
         results = []
         if self.notification.config['telegram']['enabled']:
-            success, msg = self.notification.send_telegram(message)
-            results.append(f"Telegram: {msg}")
+            self.notification.send_telegram(message)
+            results.append("Telegram: 已发送")
         
         if not results:
             print("未启用任何通知方式！")
@@ -351,40 +399,117 @@ class VPSManager:
             self.notification.send_telegram(message)
 
     def update_exchange_rates(self):
-        """更新汇率信息"""
+        """更新汇率信息 - 支持更多币种"""
         try:
             print("\n正在更新汇率...")
-            # 使用免费的汇率API
-            base_currency = 'USD'  # 使用美元作为基准货币
-            api_url = f"https://api.exchangerate-api.com/v4/latest/{base_currency}"
             
-            response = requests.get(api_url)
-            response.raise_for_status()
-            data = response.json()
+            # 使用免费的汇率API，支持更多币种
+            base_currency = 'CNY'  # 使用人民币作为基准货币
             
-            # 更新汇率数据
-            self.exchange_rates = {
-                'USD': data['rates']['CNY'],  # 转换为人民币汇率
-                'EUR': data['rates']['CNY'] / data['rates']['EUR'],
-                'CNY': 1.0,  # 基准货币
-                'CAD': data['rates']['CNY'] / data['rates']['CAD']
-            }
+            # 尝试多个API源
+            api_urls = [
+                f"https://api.exchangerate-api.com/v4/latest/{base_currency}",
+                f"https://open.er-api.com/v6/latest/{base_currency}",
+                f"https://api.fixer.io/latest?base={base_currency}"
+            ]
+            
+            rates_data = None
+            for api_url in api_urls:
+                try:
+                    response = requests.get(api_url, timeout=10)
+                    response.raise_for_status()
+                    rates_data = response.json()
+                    if 'rates' in rates_data:
+                        break
+                except Exception as e:
+                    print(f"API {api_url} 失败: {str(e)}")
+                    continue
+            
+            if not rates_data or 'rates' not in rates_data:
+                # 如果API都失败，使用默认汇率
+                print("API获取失败，使用默认汇率...")
+                self.exchange_rates = {
+                    'CNY': 1.0,      # 基准货币
+                    'USD': 0.14,     # 美元
+                    'EUR': 0.13,     # 欧元
+                    'CAD': 0.19,     # 加元
+                    'HKD': 1.09,     # 港币
+                    'JPY': 21.0,     # 日元
+                    'GBP': 0.11,     # 英镑
+                    'AUD': 0.21,     # 澳元
+                    'SGD': 0.19,     # 新加坡元
+                    'KRW': 182.0,    # 韩元
+                    'TWD': 4.5,      # 新台币
+                    'RUB': 13.0,     # 俄罗斯卢布
+                    'CHF': 0.13,     # 瑞士法郎
+                    'SEK': 1.48,     # 瑞典克朗
+                    'NOK': 1.48,     # 挪威克朗
+                    'DKK': 0.97,     # 丹麦克朗
+                    'THB': 4.9,      # 泰铢
+                    'MYR': 0.64,     # 马来西亚林吉特
+                    'INR': 12.0,     # 印度卢比
+                    'BRL': 0.77,     # 巴西雷亚尔
+                }
+            else:
+                # 成功获取汇率数据
+                self.exchange_rates = {'CNY': 1.0}  # 基准货币
+                
+                for currency in self.currencies:
+                    if currency != 'CNY':
+                        if currency in rates_data['rates']:
+                            self.exchange_rates[currency] = rates_data['rates'][currency]
+                        else:
+                            # 如果某个币种不存在，设置默认值
+                            default_rates = {
+                                'USD': 0.14, 'EUR': 0.13, 'CAD': 0.19, 'HKD': 1.09,
+                                'JPY': 21.0, 'GBP': 0.11, 'AUD': 0.21, 'SGD': 0.19,
+                                'KRW': 182.0, 'TWD': 4.5, 'RUB': 13.0, 'CHF': 0.13,
+                                'SEK': 1.48, 'NOK': 1.48, 'DKK': 0.97, 'THB': 4.9,
+                                'MYR': 0.64, 'INR': 12.0, 'BRL': 0.77
+                            }
+                            self.exchange_rates[currency] = default_rates.get(currency, 1.0)
             
             # 保存汇率到JS文件
-            js_content = f"""const exchangeRates = {json.dumps(self.exchange_rates, indent=4)};"""
+            js_content = f"""// 汇率数据 - 相对于人民币(CNY) - 更新时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+const exchangeRates = {json.dumps(self.exchange_rates, indent=4, ensure_ascii=False)};
+
+// 币种中文名称映射
+const currencyNames = {json.dumps(self.currency_names, indent=4, ensure_ascii=False)};
+
+// 格式化货币显示
+function formatCurrency(amount, currency) {{
+    const name = currencyNames[currency] || currency;
+    return `${{amount}} ${{currency}} (${{name}})`;
+}}
+"""
+            
             with open('exchange_rates.js', 'w', encoding='utf-8') as f:
                 f.write(js_content)
             
             # 显示更新后的汇率
             print("\n当前汇率（相对于CNY）：")
-            for currency, rate in self.exchange_rates.items():
-                print(f"{currency}: {rate:.4f}")
+            print("-" * 50)
+            for i, (currency, rate) in enumerate(self.exchange_rates.items(), 1):
+                name = self.currency_names.get(currency, currency)
+                print(f"{currency} ({name}): {rate:.4f}", end="  ")
+                if i % 2 == 0:  # 每行显示2个
+                    print()
+            if len(self.exchange_rates) % 2 != 0:
+                print()
+            print("-" * 50)
             
             # 发送通知
             message = "💱 汇率更新通知\n\n"
-            message += "当前汇率（相对于CNY）：\n"
-            for currency, rate in self.exchange_rates.items():
-                message += f"{currency}: {rate:.4f}\n"
+            message += f"更新时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+            message += f"支持币种: {len(self.exchange_rates)} 种\n"
+            message += "主要汇率（相对于CNY）：\n"
+            major_currencies = ['USD', 'EUR', 'HKD', 'JPY', 'GBP']
+            for currency in major_currencies:
+                if currency in self.exchange_rates:
+                    rate = self.exchange_rates[currency]
+                    name = self.currency_names.get(currency, currency)
+                    message += f"{currency}({name}): {rate:.4f}\n"
+            
             self.send_notification(message)
             
             print("\n汇率更新成功！")
@@ -395,10 +520,61 @@ class VPSManager:
             print(error_msg)
             return False
 
+    def show_currency_stats(self):
+        """显示货币统计信息"""
+        if not self.vps_data:
+            print("暂无VPS数据！")
+            return
+        
+        # 统计各币种的使用情况
+        currency_stats = {}
+        total_cost_cny = 0
+        
+        for vps in self.vps_data:
+            currency = vps['currency']
+            cost = vps['cost']
+            
+            if currency not in currency_stats:
+                currency_stats[currency] = {'count': 0, 'total_cost': 0}
+            
+            currency_stats[currency]['count'] += 1
+            currency_stats[currency]['total_cost'] += cost
+            
+            # 转换为人民币计算总成本
+            if currency in self.exchange_rates:
+                if currency == 'CNY':
+                    total_cost_cny += cost
+                else:
+                    total_cost_cny += cost / self.exchange_rates[currency]
+        
+        print("\n=== 货币使用统计 ===")
+        print("-" * 60)
+        print(f"{'币种':<8} {'中文名':<12} {'数量':<6} {'总费用':<15} {'人民币约':<12}")
+        print("-" * 60)
+        
+        for currency, stats in sorted(currency_stats.items()):
+            name = self.currency_names.get(currency, currency)
+            count = stats['count']
+            total = stats['total_cost']
+            
+            # 计算人民币等值
+            if currency == 'CNY':
+                cny_equivalent = total
+            elif currency in self.exchange_rates:
+                cny_equivalent = total / self.exchange_rates[currency]
+            else:
+                cny_equivalent = 0
+            
+            print(f"{currency:<8} {name:<12} {count:<6} {total:<15.2f} {cny_equivalent:<12.2f}")
+        
+        print("-" * 60)
+        print(f"总计: {len(self.vps_data)} 台服务器，约 {total_cost_cny:.2f} CNY")
+        print("-" * 60)
+
     def show_menu(self):
         while True:
             os.system('cls' if os.name == 'nt' else 'clear')
-            print("\n=== VPS到期监控 ===")
+            print("\n=== VPS到期监控 (支持20种货币) ===")
             print()
             print("1. 查看VPS列表")
             print("2. 添加VPS")
@@ -407,9 +583,10 @@ class VPSManager:
             print("5. 推送到GitHub")
             print("6. 通知设置")
             print("7. 更新汇率")
+            print("8. 货币统计")
             print("0. 退出")
             print()
-            print("=" * 20)
+            print("=" * 35)
             
             choice = input("\n请选择操作: ").strip()
             
@@ -427,6 +604,8 @@ class VPSManager:
                 self.notification_menu()
             elif choice == '7':
                 self.update_exchange_rates()
+            elif choice == '8':
+                self.show_currency_stats()
             elif choice == '0':
                 break
             else:
@@ -441,4 +620,4 @@ if __name__ == "__main__":
         manager.show_menu()
     except Exception as e:
         print(f"\n程序出错: {e}")
-        input("\n按回车键退出...")  # 只在出错时提示按键退出 
+        input("\n按回车键退出...")

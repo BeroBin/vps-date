@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -549,3 +550,556 @@
     </script>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPS到期监控</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 使用霞鹜文楷屏幕阅读体 -->
+    <link rel="stylesheet" href="https://npm.elemecdn.com/lxgw-wenkai-screen-webfont@1.7.0/lxgwwenkaiscreen.css">
+    <style>
+        body {
+            background-color: #b1cbf1;
+            font-family: "LXGW WenKai Screen", sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            padding-top: 30px;
+        }
+
+        /* 统计面板样式优化 */
+        .stats-container {
+            background: #f3f5fa;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        .stats-item {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .stats-item h3 {
+            color: #64748b;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .stats-item p {
+            color: #3b82f6;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        /* 卡片样式优化 */
+        .card {
+            background: #f3f5fa;
+            border: none;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-header {
+            background: #f3f5fa;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            padding: 20px;
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header span:first-child {
+            color: #475569;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        /* 状态标签样式优化 */
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-normal {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .status-danger {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        /* 卡片内容样式优化 */
+        .card-body {
+            padding: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .info-value {
+            color: #475569;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* 页面标题样式 */
+        .page-title {
+            color: #475569;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        /* 添加动态效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* 深色主题按钮样式 */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #475569;
+            color: #f8fafc;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            background: #334155;
+        }
+
+        /* 深色主题样式 */
+        body.dark-theme {
+            background-color: #1e293b;
+        }
+
+        body.dark-theme .stats-container,
+        body.dark-theme .card {
+            background: #334155;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-theme .card-header {
+            background: #334155;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-theme .info-row {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-theme .card-header span:first-child,
+        body.dark-theme .info-value {
+            color: #e2e8f0;
+        }
+
+        body.dark-theme .info-label {
+            color: #94a3b8;
+        }
+
+        body.dark-theme .page-title {
+            color: #e2e8f0;
+        }
+
+        body.dark-theme .stats-item h3 {
+            color: #94a3b8;
+        }
+
+        body.dark-theme .stats-item p {
+            color: #60a5fa;
+        }
+
+        .vps-name-link {
+            color: inherit;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .vps-name-link:hover {
+            color: #3b82f6;
+        }
+
+        /* 深色主题补充 */
+        body.dark-theme .vps-name-link:hover {
+            color: #60a5fa;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/>
+        </svg>
+    </button>
+    <div class="container">
+        <script src="exchange_rates.js"></script>
+        <h1 class="page-title">VPS到期监控</h1>
+        <!-- 状态统计面板 -->
+        <div class="stats-container">
+            <div class="row">
+                <div class="col-md-4 stats-item">
+                    <h3>服务器总数</h3>
+                    <p id="serverCount">--</p>
+                </div>
+                <div class="col-md-4 stats-item">
+                    <h3>月度总支出</h3>
+                    <p id="totalCost">--</p>
+                </div>
+                <div class="col-md-4 stats-item">
+                    <h3>即将到期</h3>
+                    <p id="expiringCount">--</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VPS卡片容器 -->
+        <div class="row" id="vpsCards">
+            <div class="col-12 text-center" id="loadingMessage">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">加载中...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 调试信息
+        console.log('脚本开始执行');
+        
+        const vpsServices = [
+    {
+        "name": "claw-jp-7刀",
+        "cost": 4.3,
+        "currency": "CNY",
+        "expireDate": "2026-01-09",
+        "color": "danger",
+        "url": "https://claw.cloud/"
+    },
+    {
+        "name": "v.ps圣何塞",
+        "cost": 20.83,
+        "currency": "CNY",
+        "expireDate": "2026-02-07",
+        "color": "primary",
+        "url": "https://vps.hosting/clientarea/"
+    },
+    {
+        "name": "OVH加拿大0.97",
+        "cost": 0.97,
+        "currency": "USD",
+        "expireDate": "2025-08-09",
+        "color": "danger",
+        "url": "https://ca.ovh.com/manager/#/hub"
+    },
+    {
+        "name": "nc-nano G11s",
+        "cost": 1.68,
+        "currency": "EUR",
+        "expireDate": "2025-6-28",
+        "color": "info",
+        "url": "https://www.customercontrolpanel.de/produkte.php"
+    },
+    {
+        "name": "斯巴达西雅图",
+        "cost": 8.0,
+        "currency": "USD",
+        "url": "https://billing.spartanhost.net/login",
+        "expireDate": "2025-05-15"
+    },
+    {
+        "name": "阿里云-hk",
+        "cost": 34.0,
+        "currency": "CNY",
+        "url": "https://www.aliyun.com/",
+        "expireDate": "2025-05-28"
+    },
+    {
+        "name": "vps1000-netcup",
+        "cost": 5.75,
+        "currency": "EUR",
+        "url": "https://www.customercontrolpanel.de/",
+        "expireDate": "2025-06-01"
+    },
+    {
+        "name": "dmit-LAX.EB.INTRO",
+        "cost": 2.5,
+        "currency": "USD",
+        "url": "https://www.dmit.io/",
+        "expireDate": "2026-01-31"
+    },
+    {
+        "name": "ovh-俄勒冈州",
+        "cost": 5.5,
+        "currency": "USD",
+        "url": "https://us.ovhcloud.com/",
+        "expireDate": "2025-06-02"
+    },
+    {
+        "name": "搬瓦工-DC1",
+        "cost": 3.03,
+        "currency": "USD",
+        "url": "https://bandwagonhost.com/services",
+        "expireDate": "2026-03-07"
+    },
+    {
+        "name": "raksmart-hk",
+        "cost": 0.0,
+        "currency": "USD",
+        "url": "https://billing.raksmart.com/",
+        "expireDate": "2025-11-09"
+    },
+    {
+        "name": "prohosting24-4.95",
+        "cost": 4.95,
+        "currency": "EUR",
+        "url": "https://prohosting24.net/easter-deal",
+        "expireDate": "2025-05-20"
+    },
+    {
+        "name": "netcup-rs1000",
+        "cost": 8.24,
+        "currency": "EUR",
+        "url": "https://www.customercontrolpanel.de/",
+        "expireDate": "2025-05-20"
+    },
+    {
+        "name": "Cstserver-LAX1",
+        "cost": 0.8325,
+        "currency": "USD",
+        "url": "https://cstserver.com/clientarea.php?action=products&group=cloud",
+        "expireDate": "2026-04-30"
+    },
+    {
+        "name": "kuroit-新加坡",
+        "cost": 4.0,
+        "currency": "USD",
+        "url": "https://my.kuroit.com/clientarea.php?action=services",
+        "expireDate": "2025-05-30"
+    },
+    {
+        "name": "ovh-杜甫-法国",
+        "cost": 9.99,
+        "currency": "EUR",
+        "url": "https://www.ovh.com/manager/#/hub/",
+        "expireDate": "2025-06-07"
+    },
+    {
+        "name": "sakuraclouds-洛杉矶",
+        "cost": 2.5,
+        "currency": "USD",
+        "url": "https://portal.sakuraclouds.com/",
+        "expireDate": "2025-06-07"
+    },
+    {
+        "name": "rarecloud-荷兰",
+        "cost": 0.908,
+        "currency": "EUR",
+        "url": "https://rarecloud.io/",
+        "expireDate": "2026-05-08"
+    },
+    {
+        "name": "cst-hk",
+        "cost": 2.49,
+        "currency": "USD",
+        "url": "https://cstserver.com/",
+        "expireDate": "2025-06-12"
+    }
+];
+        
+        console.log('VPS服务数据:', vpsServices);  // 添加调试输出
+
+        function formatDate(date) {
+            return date.toLocaleDateString('zh-CN', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function calculateDaysUntilExpire(service) {
+            try {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);  // 设置时间为当天0点
+                let expireDate;
+                
+                if (service.expireDate) {
+                    expireDate = new Date(service.expireDate);
+                    expireDate.setHours(0, 0, 0, 0);  // 设置到期时间为当天0点
+                } else if (service.monthlyExpireDay) {
+                    expireDate = new Date(today.getFullYear(), today.getMonth(), service.monthlyExpireDay);
+                    if (today.getDate() > service.monthlyExpireDay) {
+                        expireDate = new Date(today.getFullYear(), today.getMonth() + 1, service.monthlyExpireDay);
+                    }
+                } else {
+                    return '未设置到期日';
+                }
+                
+                const diffTime = expireDate - today;
+                return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            } catch (error) {
+                console.error('计算到期日期时出错:', error);
+                return '计算错误';
+            }
+        }
+
+        function convertToCNY(amount, currency) {
+            if (exchangeRates[currency] && !isNaN(amount)) {
+                return amount * exchangeRates[currency];
+            }
+            return 0;
+        }
+
+        function updateVPSCards() {
+            try {
+                const container = document.getElementById('vpsCards');
+                
+                // 计算到期天数并排序
+                const sortedServices = [...vpsServices].sort((a, b) => {
+                    const daysA = calculateDaysUntilExpire(a);
+                    const daysB = calculateDaysUntilExpire(b);
+                    return (typeof daysA === 'number' && typeof daysB === 'number') ? daysA - daysB : 0;
+                });
+
+                let totalCostCNY = 0;
+                let expiringCount = 0;
+
+                const cardsHTML = sortedServices.map(service => {
+                    const daysLeft = calculateDaysUntilExpire(service);
+                    const costInCNY = convertToCNY(parseFloat(service.cost), service.currency);
+                    totalCostCNY += costInCNY;
+                    
+                    if (typeof daysLeft === 'number' && daysLeft <= 3) {
+                        expiringCount++;
+                    }
+
+                    let statusClass = 'status-normal';
+                    if (typeof daysLeft === 'number') {
+                        if (daysLeft <= 3) statusClass = 'status-danger';
+                        else if (daysLeft <= 7) statusClass = 'status-warning';
+                    }
+
+                    let expireDateText = service.expireDate ? 
+                        formatDate(new Date(service.expireDate)) : 
+                        service.monthlyExpireDay ? `每月${service.monthlyExpireDay}号` : '未设置';
+
+                    return `
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <span><a href="${service.url}" target="_blank" class="vps-name-link">${service.name}</a></span>
+                                    <span class="status-badge ${statusClass}">
+                                        ${typeof daysLeft === 'number' ? `剩余 ${daysLeft} 天` : daysLeft}
+                                    </span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="info-row">
+                                        <span class="info-label">月付金额</span>
+                                        <span class="info-value">${service.cost} ${service.currency}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">人民币</span>
+                                        <span class="info-value">${costInCNY ? '￥' + costInCNY.toFixed(2) : '￥0.00'}</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">到期时间</span>
+                                        <span class="info-value">${expireDateText}</span>
+                                    </div>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <a href="${service.url}" target="_blank" class="vps-link">访问控制面板</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                container.innerHTML = cardsHTML;
+                document.getElementById('totalCost').textContent = totalCostCNY ? `￥${totalCostCNY.toFixed(2)}` : '￥0.00';
+                document.getElementById('serverCount').textContent = vpsServices.length;
+                document.getElementById('expiringCount').textContent = expiringCount;
+            } catch (error) {
+                console.error('更新VPS卡片时出错:', error);
+            }
+        }
+
+        // 初始更新
+        document.addEventListener('DOMContentLoaded', updateVPSCards);
+        
+        // 每天更新一次
+        setInterval(updateVPSCards, 24 * 60 * 60 * 1000);
+
+        // 主题切换功能
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        // 检查本地存储中的主题设置
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-theme');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-theme');
+            // 保存主题设置到本地存储
+            localStorage.setItem('theme', body.classList.contains('dark-theme') ? 'dark' : 'light');
+        });
+    </script>
+</body>
+</html>
+>>>>>>> c744c3255698883eaa9fb21fc1d27f29bcd099bf

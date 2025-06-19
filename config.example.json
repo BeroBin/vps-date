@@ -1,0 +1,7 @@
+{
+    "telegram": {
+        "enabled": true,
+        "bot_token": "电报密钥",
+        "chat_id": "电报ID"
+    }
+} 
