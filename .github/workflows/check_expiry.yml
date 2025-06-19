@@ -1,0 +1,36 @@
+name: Check VPS Expiry
+
+on:
+  schedule:
+    - cron: '0 0,12 * * *'  # 北京时间每天 8:00 和 20:00
+  workflow_dispatch:      # 允许手动触发
+
+jobs:
+  check-expiry:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+    
+    - name: Create config file
+      run: |
+        echo '{
+          "telegram": {
+            "enabled": true,
+            "bot_token": "${{ secrets.TELEGRAM_BOT_TOKEN }}",
+            "chat_id": "${{ secrets.TELEGRAM_CHAT_ID }}"
+          }
+        }' > config.json
+    
+    - name: Run expiry check
+      run: python vps_monitor.py 
