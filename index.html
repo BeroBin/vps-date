@@ -212,19 +212,111 @@
     <script>
         // --- DATA (已从您的文件中恢复) ---
         const vpsServices = [
-            { "name": "BWG-NODESEEK-MEGABOX-PRO", "cost": 45.68, "currency": "USD", "billingCycle": "Annually", "nextDueDate": "2026-05-26", "url": "https://bandwagonhost.com/services" },
-            { "name": "Akile-HKS-BlindBox-Starter", "cost": 169.9, "currency": "CNY", "billingCycle": "Annually", "nextDueDate": "2025-12-03", "url": "https://akile.io/console" },
-            { "name": "CNF-HKL Special", "cost": 100.0, "currency": "HKD", "billingCycle": "Annually", "nextDueDate": "2026-05-24", "url": "https://cnfaster.com/productdetail.htm?id=1963" },
-            { "name": "uqidc-香港荃湾-1G", "cost": 99.0, "currency": "CNY", "billingCycle": "Annually", "nextDueDate": "2026-05-26", "url": "https://www.uqidc.com/servicedetail?id=20713" },
-            { "name": "LegendVPS-US-NYC-1G US NYC", "cost": 0.5, "currency": "USD", "billingCycle": "Monthly", "nextDueDate": "2025-07-18", "url": "https://legendvps.com/clientarea.php?action=productdetails&id=5736" },
-            { "name": "Bytevirt-LA-China Optimized", "cost": 24.0, "currency": "USD", "billingCycle": "Annually", "nextDueDate": "2026-02-11", "url": "https://bytevirt.com/clientarea.php?action=productdetails&id=20339" },
-            { "name": "Colocrossing-Black Friday (2023) Specials", "cost": 15.0, "currency": "USD", "billingCycle": "Annually", "nextDueDate": "2026-03-04", "url": "https://cloud.colocrossing.com/clientarea.php?action=productdetails&id=7448" },
-            { "name": "Scaleway-PAR1", "cost": 0.13, "currency": "EUR", "billingCycle": "Monthly", "nextDueDate": "2099-12-12", "url": "https://console.scaleway.com/instance/servers" },
-            { "name": "CLAW-HK", "cost": 8.4, "currency": "USD", "billingCycle": "Quarterly", "nextDueDate": "2025-07-22", "url": "https://claw.cloud/clientarea.php?action=productdetails&id=7772" },
-            { "name": "CLAW-JP", "cost": 7.0, "currency": "USD", "billingCycle": "Annually", "nextDueDate": "2026-01-23", "url": "https://claw.cloud/clientarea.php?action=productdetails&id=33367" },
-            { "name": "WAWO-HKd-ipv6-0.5G-2台", "cost": 31.8, "currency": "CNY", "billingCycle": "Annually", "nextDueDate": "2025-10-21", "url": "https://wawo.wiki/clientarea.php?action=productdetails&id=6764" },
-            { "name": "Mitce-airport", "cost": 4.9, "currency": "USD", "billingCycle": "Annually", "nextDueDate": "2026-07-06", "url": "https://mitce.net/clientarea.php?action=productdetails&id=278418" }
-        ];
+    {
+        "name": "BWG-NODESEEK-MEGABOX-PRO",
+        "cost": 45.68,
+        "currency": "USD",
+        "billingCycle": "Annually",
+        "nextDueDate": "2026-05-26",
+        "url": "https://bandwagonhost.com/services"
+    },
+    {
+        "name": "Akile-HKS-BlindBox-Starter",
+        "cost": 169.9,
+        "currency": "CNY",
+        "billingCycle": "Annually",
+        "nextDueDate": "2025-12-03",
+        "url": "https://akile.io/console"
+    },
+    {
+        "name": "CNF-HKL Special",
+        "cost": 100.0,
+        "currency": "HKD",
+        "billingCycle": "Annually",
+        "nextDueDate": "2026-05-24",
+        "url": "https://cnfaster.com/productdetail.htm?id=1963"
+    },
+    {
+        "name": "uqidc-香港荃湾-1G",
+        "cost": 99.0,
+        "currency": "CNY",
+        "billingCycle": "Annually",
+        "nextDueDate": "2026-05-26",
+        "url": "https://www.uqidc.com/servicedetail?id=20713"
+    },
+    {
+        "name": "LegendVPS-US-NYC-1G US NYC",
+        "cost": 0.5,
+        "currency": "USD",
+        "billingCycle": "Monthly",
+        "nextDueDate": "2025-07-18",
+        "url": "https://legendvps.com/clientarea.php?action=productdetails&id=5736"
+    },
+    {
+        "name": "Bytevirt-LA-China Optimized",
+        "cost": 24.0,
+        "currency": "USD",
+        "billingCycle": "Annually",
+        "nextDueDate": "2026-02-11",
+        "url": "https://bytevirt.com/clientarea.php?action=productdetails&id=20339"
+    },
+    {
+        "name": "Colocrossing-Black Friday (2023) Specials",
+        "cost": 15.0,
+        "currency": "USD",
+        "billingCycle": "Annually",
+        "nextDueDate": "2026-03-04",
+        "url": "https://cloud.colocrossing.com/clientarea.php?action=productdetails&id=7448"
+    },
+    {
+        "name": "Scaleway-PAR1",
+        "cost": 0.13,
+        "currency": "EUR",
+        "billingCycle": "Monthly",
+        "nextDueDate": "2099-12-12",
+        "url": "https://console.scaleway.com/instance/servers"
+    },
+    {
+        "name": "CLAW-HK",
+        "cost": 8.4,
+        "currency": "USD",
+        "billingCycle": "Quarterly",
+        "nextDueDate": "2025-07-22",
+        "url": "https://claw.cloud/clientarea.php?action=productdetails&id=7772"
+    },
+    {
+        "name": "CLAW-JP",
+        "cost": 7.0,
+        "currency": "USD",
+        "billingCycle": "Annually",
+        "nextDueDate": "2026-01-23",
+        "url": "https://claw.cloud/clientarea.php?action=productdetails&id=33367"
+    },
+    {
+        "name": "WAWO-HKd-ipv6-0.5G-2台",
+        "cost": 31.8,
+        "currency": "CNY",
+        "billingCycle": "Annually",
+        "nextDueDate": "2025-10-21",
+        "url": "https://wawo.wiki/clientarea.php?action=productdetails&id=6764"
+    },
+    {
+        "name": "Mitce-airport",
+        "cost": 4.9,
+        "currency": "USD",
+        "billingCycle": "Annually",
+        "nextDueDate": "2026-07-06",
+        "url": "https://mitce.net/clientarea.php?action=productdetails&id=278418"
+    },
+    {
+        "name": "Aliyun-2H2G",
+        "cost": 68.0,
+        "currency": "CNY",
+        "billingCycle": "Annually",
+        "nextDueDate": "2026-07-03",
+        "url": "https://swasnext.console.aliyun.com/servers/cn-guangzhou"
+    }
+];
 
         // 沿用您原有的逻辑和数据结构
         const billingCycleNames = { 'Monthly': '月付', 'Quarterly': '季度付', 'Semi-Annually': '半年付', 'Annually': '年付', 'Biennially': '2年付', 'Triennially': '3年付' };
